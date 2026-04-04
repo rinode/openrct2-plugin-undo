@@ -47,10 +47,10 @@ jobs:
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
-        files: build/openrct2-plugin-boilerplate.js
+        files: build/openrct2-plugin-undo.js
         body: |
           ## Installation
-          Download `openrct2-plugin-boilerplate.js` and place it in your OpenRCT2 plugin directory:
+          Download `openrct2-plugin-undo.js` and place it in your OpenRCT2 plugin directory:
           - Windows: `%USERPROFILE%\Documents\OpenRCT2\plugin\`
           - macOS: `~/Library/Application Support/OpenRCT2/plugin/`
           - Linux: `~/.config/OpenRCT2/plugin/`

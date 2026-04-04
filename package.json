@@ -1,0 +1,21 @@
+{
+  "name": "openrct2-plugin-boilerplate",
+  "version": "0.0.2",
+  "description": "A boilerplate for creating OpenRCT2 plugins with TypeScript and Rollup",
+  "type": "module",
+  "scripts": {
+    "build": "cross-env BUILD=release rollup -c",
+    "develop": "rollup -c --watch"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@openrct2/types": "^0.4.32",
+    "@rollup/plugin-node-resolve": "^15.3.1",
+    "@rollup/plugin-typescript": "^12.1.1",
+    "cross-env": "^10.1.0",
+    "rollup": "^4.28.1",
+    "tslib": "^2.8.1",
+    "typescript": "^5.7.0"
+  }
+}

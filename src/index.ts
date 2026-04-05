@@ -39,6 +39,6 @@ registerPlugin({
     licence: "MIT",
     authors: ["rinode"],
     type: "local",
-    targetApiVersion: 77,
+    targetApiVersion: 111,
     main,
 });

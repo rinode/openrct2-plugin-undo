@@ -13,7 +13,7 @@
     "openrct2-flexui": "next"
   },
   "devDependencies": {
-    "@openrct2/types": "0.4.32",
+    "@openrct2/types": "0.4.32-dev.111.20260405103454",
     "@rollup/plugin-node-resolve": "^15.3.1",
     "@rollup/plugin-typescript": "^12.1.1",
     "cross-env": "^10.1.0",

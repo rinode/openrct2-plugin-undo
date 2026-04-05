@@ -1,5 +1,5 @@
 import { getInverter, supportedActions, PreSnapshot, TileSnapshot, ResultPosition } from "./inverses";
-import { pushEntry } from "./history";
+import { addAction } from "./batcher";
 
 const pendingSnapshots = new Map<string, PreSnapshot>();
 
@@ -255,6 +255,63 @@ function getResultPosition(
         }
     }
 
+    if (action === "footpathplace" || action === "footpathlayoutplace") {
+        const tile = map.getTile(tx, ty);
+        for (let i = tile.numElements - 1; i >= 0; i--) {
+            const el = tile.getElement(i);
+            if (el.type === "footpath") {
+                return { x: rx, y: ry, z: el.baseZ };
+            }
+        }
+    }
+
+    if (action === "footpathadditionplace") {
+        const tile = map.getTile(tx, ty);
+        for (let i = tile.numElements - 1; i >= 0; i--) {
+            const el = tile.getElement(i);
+            if (el.type === "footpath") {
+                const fe = el as FootpathElement;
+                if (fe.addition != null && fe.addition > 0) {
+                    return { x: rx, y: ry, z: el.baseZ };
+                }
+            }
+        }
+    }
+
+    if (action === "bannerplace") {
+        const tile = map.getTile(tx, ty);
+        const dir = args.direction as number;
+        for (let i = tile.numElements - 1; i >= 0; i--) {
+            const el = tile.getElement(i);
+            if (el.type === "banner") {
+                const be = el as BannerElement;
+                if (be.direction === dir) {
+                    return { x: rx, y: ry, z: el.baseZ };
+                }
+            }
+        }
+    }
+
+    if (action === "parkentranceplace") {
+        const tile = map.getTile(tx, ty);
+        for (let i = tile.numElements - 1; i >= 0; i--) {
+            const el = tile.getElement(i);
+            if (el.type === "entrance") {
+                return { x: rx, y: ry, z: el.baseZ };
+            }
+        }
+    }
+
+    if (action === "rideentranceexitplace") {
+        const tile = map.getTile(tx, ty);
+        for (let i = tile.numElements - 1; i >= 0; i--) {
+            const el = tile.getElement(i);
+            if (el.type === "entrance") {
+                return { x: rx, y: ry, z: el.baseZ };
+            }
+        }
+    }
+
     if (result?.position) {
         return { x: result.position.x, y: result.position.y, z: result.position.z };
     }
@@ -322,7 +379,7 @@ export function installListener(): void {
         const inverse = inverter(args, snap, resultPos);
         if (!inverse) return;
 
-        pushEntry({
+        addAction({
             label: labelFor(action),
             action,
             originalArgs: args,

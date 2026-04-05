@@ -1,4 +1,5 @@
 import { installListener } from "./listener";
+import { initBatcher } from "./batcher";
 import { performUndo, performRedo } from "./executor";
 import { createUndoWindow } from "./ui";
 
@@ -7,6 +8,7 @@ const PLUGIN_VERSION = "0.1.0";
 
 function main(): void {
     installListener();
+    initBatcher();
 
     if (typeof ui !== "undefined") {
         ui.registerMenuItem("Undo / Redo", () => {

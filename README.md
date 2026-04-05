@@ -12,7 +12,13 @@ Undo/redo plugin for OpenRCT2. Tracks player-initiated actions and lets you reve
 - Water raise/lower/set height
 - Surface style changes
 
-Only the local player's actions are tracked. History is capped at 50 entries. New actions clear the redo stack.
+Only the local player's actions are tracked. Ghost/preview actions are ignored. History is capped at 50 entries. New actions clear the redo stack.
+
+## Action Batching
+
+Rapid sequences of actions are automatically grouped into a single undo/redo entry. This means dragging terrain up and down, placing a row of path tiles, or other quick repeated actions can be undone in one step instead of individually.
+
+Batching uses a debounce window (default 5 ticks, ~165ms). Actions that occur within this window of each other are merged into a single batch.
 
 ## Shortcuts
 

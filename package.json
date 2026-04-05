@@ -1,6 +1,6 @@
 {
   "name": "openrct2-plugin-undo",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Undo/redo for OpenRCT2",
   "type": "module",
   "scripts": {

@@ -1,4 +1,4 @@
-import { popUndo, popRedo, canUndo, canRedo, isBatch, StackEntry } from "./history";
+import { popUndo, popRedo, canUndo, canRedo, isBatch, StackEntry, HistoryEntry } from "./history";
 import { InverseAction, TileSnapshot } from "./inverses";
 import { setSuppressed } from "./listener";
 
@@ -33,16 +33,23 @@ function executeInverse(entry: StackEntry): void {
     }
 }
 
+function redoSingle(e: HistoryEntry): void {
+    if (e.snapshot?.postTiles) {
+        restoreTiles(e.snapshot.postTiles);
+    } else {
+        context.executeAction(e.action, e.originalArgs as any);
+    }
+}
+
 function executeRedo(entry: StackEntry): void {
     setSuppressed(true);
     try {
         if (isBatch(entry)) {
-            // Redo in forward order
             for (const e of entry.entries) {
-                context.executeAction(e.action, e.originalArgs as any);
+                redoSingle(e);
             }
         } else {
-            context.executeAction(entry.action, entry.originalArgs as any);
+            redoSingle(entry);
         }
     } finally {
         context.setTimeout(() => setSuppressed(false), 1);

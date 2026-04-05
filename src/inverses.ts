@@ -20,6 +20,7 @@ export interface ResultPosition {
 
 export type PreSnapshot = {
     tiles?: TileSnapshot[];
+    postTiles?: TileSnapshot[];
     oldValues?: Record<string, unknown>;
 };
 

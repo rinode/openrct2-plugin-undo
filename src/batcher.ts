@@ -41,7 +41,31 @@ export function setMouseHeld(held: boolean): void {
     }
 }
 
+function isDuplicate(a: HistoryEntry, b: HistoryEntry): boolean {
+    if (a.action !== b.action) return false;
+    const ka = Object.keys(a.originalArgs);
+    const kb = Object.keys(b.originalArgs);
+    if (ka.length !== kb.length) return false;
+    for (const k of ka) {
+        if (a.originalArgs[k] !== b.originalArgs[k]) return false;
+    }
+    return true;
+}
+
+/** Reset the debounce timer without adding an entry (e.g. for filtered no-ops). */
+export function keepAlive(): void {
+    if (currentBatch.length > 0) {
+        lastActionTick = currentTick;
+    }
+}
+
 export function addAction(entry: HistoryEntry): void {
+    const prev = currentBatch[currentBatch.length - 1];
+    if (prev && isDuplicate(prev, entry)) {
+        // Skip duplicate, but still reset the debounce timer
+        lastActionTick = currentTick;
+        return;
+    }
     currentBatch.push(entry);
     lastActionTick = currentTick;
 }

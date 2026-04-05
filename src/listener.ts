@@ -1,5 +1,5 @@
 import { getInverter, supportedActions, PreSnapshot, TileSnapshot, ResultPosition } from "./inverses";
-import { addAction } from "./batcher";
+import { addAction, keepAlive } from "./batcher";
 
 const pendingSnapshots = new Map<string, PreSnapshot>();
 
@@ -73,6 +73,16 @@ function snapshotTiles(args: Record<string, unknown>): TileSnapshot[] {
         }
     }
     return tiles;
+}
+
+function snapshotSingleTile(args: Record<string, unknown>): TileSnapshot[] {
+    const x = (args.x ?? args.x1) as number | undefined;
+    const y = (args.y ?? args.y1) as number | undefined;
+    if (x == null || y == null) return [];
+    const tx = Math.floor(x / 32);
+    const ty = Math.floor(y / 32);
+    const tile = map.getTile(tx, ty);
+    return [{ x: tx, y: ty, data: Array.from(tile.data) }];
 }
 
 const removalActions = new Set([
@@ -343,14 +353,14 @@ export function installListener(): void {
 
         if (terrainActions.has(action)) {
             snap.tiles = snapshotTiles(args);
+        } else {
+            snap.tiles = snapshotSingleTile(args);
         }
         if (removalActions.has(action)) {
             snap.oldValues = snapshotElement(action, args);
         }
 
-        if (snap.tiles || snap.oldValues) {
-            pendingSnapshots.set(key, snap);
-        }
+        pendingSnapshots.set(key, snap);
     });
 
     context.subscribe("action.execute", (event: any) => {
@@ -368,6 +378,7 @@ export function installListener(): void {
         pendingSnapshots.delete(key);
 
         if (snap?.tiles && !tilesChanged(snap.tiles)) {
+            keepAlive();
             return;
         }
 

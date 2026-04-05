@@ -190,9 +190,9 @@ const inverters: Record<string, Inverter> = {
         };
     },
 
-    rideentranceexitplace: (a) => ({
+    rideentranceexitplace: (a, _snap, pos) => ({
         action: "rideentranceexitremove",
-        args: { x: a.x, y: a.y, ride: a.ride, station: a.station, isExit: a.isExit },
+        args: { x: pos?.x ?? a.x, y: pos?.y ?? a.y, ride: a.ride, station: a.station, isExit: a.isExit },
     }),
     rideentranceexitremove: (a, snap) => {
         const old = snap?.oldValues;

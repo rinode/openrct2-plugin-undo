@@ -1,4 +1,4 @@
-import { store, Store } from "openrct2-flexui";
+import { store } from "openrct2-flexui";
 import { InverseAction, PreSnapshot } from "./inverses";
 
 export interface HistoryEntry {
@@ -9,10 +9,21 @@ export interface HistoryEntry {
     snapshot?: PreSnapshot;
 }
 
+export interface BatchEntry {
+    label: string;
+    entries: HistoryEntry[];
+}
+
+export type StackEntry = HistoryEntry | BatchEntry;
+
+export function isBatch(entry: StackEntry): entry is BatchEntry {
+    return "entries" in entry;
+}
+
 const MAX_HISTORY = 50;
 
-const undoStack: HistoryEntry[] = [];
-const redoStack: HistoryEntry[] = [];
+const undoStack: StackEntry[] = [];
+const redoStack: StackEntry[] = [];
 
 const revision = store(0);
 function bump(): void { revision.set(revision.get() + 1); }
@@ -26,15 +37,24 @@ export function pushEntry(entry: HistoryEntry): void {
     bump();
 }
 
-export function peekUndo(): HistoryEntry | undefined {
+export function pushBatchEntry(batch: BatchEntry): void {
+    undoStack.push(batch);
+    if (undoStack.length > MAX_HISTORY) {
+        undoStack.shift();
+    }
+    redoStack.length = 0;
+    bump();
+}
+
+export function peekUndo(): StackEntry | undefined {
     return undoStack[undoStack.length - 1];
 }
 
-export function peekRedo(): HistoryEntry | undefined {
+export function peekRedo(): StackEntry | undefined {
     return redoStack[redoStack.length - 1];
 }
 
-export function popUndo(): HistoryEntry | undefined {
+export function popUndo(): StackEntry | undefined {
     const entry = undoStack.pop();
     if (entry) {
         redoStack.push(entry);
@@ -43,7 +63,7 @@ export function popUndo(): HistoryEntry | undefined {
     return entry;
 }
 
-export function popRedo(): HistoryEntry | undefined {
+export function popRedo(): StackEntry | undefined {
     const entry = redoStack.pop();
     if (entry) {
         undoStack.push(entry);
@@ -58,11 +78,11 @@ export function clearHistory(): void {
     bump();
 }
 
-export function getUndoStack(): readonly HistoryEntry[] {
+export function getUndoStack(): readonly StackEntry[] {
     return undoStack;
 }
 
-export function getRedoStack(): readonly HistoryEntry[] {
+export function getRedoStack(): readonly StackEntry[] {
     return redoStack;
 }
 

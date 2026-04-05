@@ -382,6 +382,14 @@ export function installListener(): void {
             return;
         }
 
+        // Capture post-action tile state for terrain actions so redo can
+        // restore tiles directly instead of replaying the action.
+        if (snap?.tiles && terrainActions.has(action)) {
+            snap.postTiles = snap.tiles.map(
+                t => ({ x: t.x, y: t.y, data: Array.from(map.getTile(t.x, t.y).data) }),
+            );
+        }
+
         const resultPos = getResultPosition(action, args, event.result);
 
         const inverter = getInverter(action);
